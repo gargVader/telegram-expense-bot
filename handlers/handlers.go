@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gargVader/telegram-expense-bot/models/category"
 	"gopkg.in/telebot.v3"
 )
 
@@ -24,14 +25,16 @@ func AddSpendHandler(c telebot.Context) error {
 		text = c.Text()
 	)
 
+	// Number of words is less than 2
 	vals := strings.Split(text, " ")
 	if len(vals) < 2 {
-		return c.Send("Wrong spend format")
+		return c.Send(wrong_spend_format_message)
 	}
 
+	// First word is not a Float
 	amount, err := strconv.ParseFloat(vals[0], 64)
 	if err != nil {
-		return c.Send("Wrong spend format")
+		return c.Send(wrong_spend_format_message)
 	}
 
 	name := strings.Join(vals[1:], " ")
@@ -39,15 +42,11 @@ func AddSpendHandler(c telebot.Context) error {
 	fmt.Printf("Amount=%g, Name=%s\n", amount, name)
 
 	// Form Response
-	resp := fmt.Sprintf("Which category does <strong>%s</strong> belong to?", name)
+	resp := makeWhichCategoryMessage(name)
 	selector := &telebot.ReplyMarkup{}
+	rowList := mapExpenseCategoryToSelectorRowList(*selector, category.ExpenseCategories, amount, name)
 	selector.Inline(
-		selector.Row(selector.Data("🍔 Outside Food", "outside_food", strconv.FormatFloat(amount, 'f', -1, 64), name)),
-		selector.Row(selector.Data("🛒 Groceries", "groceries")),
-		selector.Row(selector.Data("🚉 Commuting", "commuting")),
-		selector.Row(selector.Data("👕👟🎧Clothes & Electronics", "utilities")),
-		selector.Row(selector.Data("📱🛜🔌🚰⛽️Mobile, Utilites", "utilities")),
-		selector.Row(selector.Data("Miscelleaneous", "miscelleaneous")),
+		rowList...,
 	)
 
 	return c.EditOrSend(resp, selector, "HTML")
@@ -63,7 +62,18 @@ func CallbackHandler(c telebot.Context) error {
 	name := args[2]
 
 	fmt.Println(args[0])
-	resp := fmt.Sprintf("Expense Update! 📈\n\n✅ Successfully added <strong>¥%s</strong> spent at <strong>%s</strong> under %s", amount, name, category)
-	return c.EditOrSend(resp, "HTML")
 
+	// Save to database
+
+	resp := makeSuccessMessage(amount, name, category)
+	return c.EditOrSend(resp, "HTML")
+}
+
+func mapExpenseCategoryToSelectorRowList(selector telebot.ReplyMarkup, expenseCategoryList []category.ExpenseCategory, amount float64, name string) []telebot.Row {
+	var rowList []telebot.Row
+	for _, category := range expenseCategoryList {
+		row := selector.Row(selector.Data(category.DisplayName, category.Name, strconv.FormatFloat(amount, 'f', -1, 64), name))
+		rowList = append(rowList, row)
+	}
+	return rowList
 }
