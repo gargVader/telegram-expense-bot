@@ -1,7 +1,7 @@
 package category
 
 type ExpenseCategory struct {
-	Name        string
+	ID          string
 	DisplayName string
 }
 
@@ -11,14 +11,15 @@ var CommutingCategory = newCommutingCategory()
 var PurchasesCategory = newPurchasesCategory()
 var UtilitiesCategory = newUtilitesCategory()
 var MiscelleaneousCategory = newMiscellaneousCategory()
+var ReimbursementCategory = newReimbursementCategory()
 
 var categoryMap = map[string]ExpenseCategory{
-	OutsideFoodCategory.Name:    *OutsideFoodCategory,
-	GrocerieCategory.Name:       *GrocerieCategory,
-	CommutingCategory.Name:      *CommutingCategory,
-	PurchasesCategory.Name:      *PurchasesCategory,
-	UtilitiesCategory.Name:      *UtilitiesCategory,
-	MiscelleaneousCategory.Name: *MiscelleaneousCategory,
+	OutsideFoodCategory.ID:    *OutsideFoodCategory,
+	GrocerieCategory.ID:       *GrocerieCategory,
+	CommutingCategory.ID:      *CommutingCategory,
+	PurchasesCategory.ID:      *PurchasesCategory,
+	UtilitiesCategory.ID:      *UtilitiesCategory,
+	MiscelleaneousCategory.ID: *MiscelleaneousCategory,
 }
 
 var ExpenseCategories = []ExpenseCategory{
@@ -52,4 +53,8 @@ func newUtilitesCategory() *ExpenseCategory {
 
 func newMiscellaneousCategory() *ExpenseCategory {
 	return &ExpenseCategory{"miscelleaneous", "Miscelleaneous"}
+}
+
+func newReimbursementCategory() *ExpenseCategory {
+	return &ExpenseCategory{"reimbursement", "Reimbursement"}
 }

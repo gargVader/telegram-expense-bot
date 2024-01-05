@@ -72,7 +72,7 @@ func CallbackHandler(c telebot.Context) error {
 func mapExpenseCategoryToSelectorRowList(selector telebot.ReplyMarkup, expenseCategoryList []category.ExpenseCategory, amount float64, name string) []telebot.Row {
 	var rowList []telebot.Row
 	for _, category := range expenseCategoryList {
-		row := selector.Row(selector.Data(category.DisplayName, category.Name, strconv.FormatFloat(amount, 'f', -1, 64), name))
+		row := selector.Row(selector.Data(category.DisplayName, category.ID, strconv.FormatFloat(amount, 'f', -1, 64), name))
 		rowList = append(rowList, row)
 	}
 	return rowList
