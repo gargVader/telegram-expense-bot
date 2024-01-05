@@ -1,60 +1,68 @@
 package category
 
-type ExpenseCategory struct {
-	ID          string
-	DisplayName string
+type Category struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"displayName"`
+}
+
+type SubCategory struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"displayName"`
+	CategoryID  string `json:"categoryId"`
 }
 
 var OutsideFoodCategory = newOutsideFoodCategory()
-var GrocerieCategory = newGroceriesCategory()
+var GroceriesCategory = newGroceriesCategory()
 var CommutingCategory = newCommutingCategory()
 var PurchasesCategory = newPurchasesCategory()
 var UtilitiesCategory = newUtilitesCategory()
-var MiscelleaneousCategory = newMiscellaneousCategory()
+var MiscellaneousCategory = newMiscellaneousCategory()
 var ReimbursementCategory = newReimbursementCategory()
 
-var categoryMap = map[string]ExpenseCategory{
-	OutsideFoodCategory.ID:    *OutsideFoodCategory,
-	GrocerieCategory.ID:       *GrocerieCategory,
-	CommutingCategory.ID:      *CommutingCategory,
-	PurchasesCategory.ID:      *PurchasesCategory,
-	UtilitiesCategory.ID:      *UtilitiesCategory,
-	MiscelleaneousCategory.ID: *MiscelleaneousCategory,
+var categoryMap = map[string]Category{
+	OutsideFoodCategory.ID:   *OutsideFoodCategory,
+	GroceriesCategory.ID:     *GroceriesCategory,
+	CommutingCategory.ID:     *CommutingCategory,
+	PurchasesCategory.ID:     *PurchasesCategory,
+	UtilitiesCategory.ID:     *UtilitiesCategory,
+	MiscellaneousCategory.ID: *MiscellaneousCategory,
+	ReimbursementCategory.ID: *ReimbursementCategory,
 }
 
-var ExpenseCategories = []ExpenseCategory{
+var ExpenseCategories = []Category{
 	*OutsideFoodCategory,
-	*GrocerieCategory,
+	*GroceriesCategory,
 	*CommutingCategory,
 	*PurchasesCategory,
 	*UtilitiesCategory,
-	*MiscelleaneousCategory,
+	*MiscellaneousCategory,
+	*ReimbursementCategory,
 }
 
-func newOutsideFoodCategory() *ExpenseCategory {
-	return &ExpenseCategory{"outside_food", "🍔 Outside Food"}
+func newOutsideFoodCategory() *Category {
+	return &Category{"outside_food", "🍔 Outside Food"}
 }
 
-func newGroceriesCategory() *ExpenseCategory {
-	return &ExpenseCategory{"groceries", "🛒 Groceries"}
+func newGroceriesCategory() *Category {
+	return &Category{"groceries", "🛒 Groceries"}
 }
 
-func newCommutingCategory() *ExpenseCategory {
-	return &ExpenseCategory{"commuting", "🚉 Commuting"}
+func newCommutingCategory() *Category {
+	return &Category{"commuting", "🚉 Commuting"}
 }
 
-func newPurchasesCategory() *ExpenseCategory {
-	return &ExpenseCategory{"purchases", "👕👟🎧 Purchases"}
+func newPurchasesCategory() *Category {
+	return &Category{"purchases", "👕👟🎧 Purchases"}
 }
 
-func newUtilitesCategory() *ExpenseCategory {
-	return &ExpenseCategory{"utilities", "📱🛜🔌🚰⛽️Mobile, Utilites"}
+func newUtilitesCategory() *Category {
+	return &Category{"utilities", "📱🛜🔌🚰⛽️Mobile, Utilites"}
 }
 
-func newMiscellaneousCategory() *ExpenseCategory {
-	return &ExpenseCategory{"miscelleaneous", "Miscelleaneous"}
+func newMiscellaneousCategory() *Category {
+	return &Category{"miscelleaneous", "Miscelleaneous"}
 }
 
-func newReimbursementCategory() *ExpenseCategory {
-	return &ExpenseCategory{"reimbursement", "Reimbursement"}
+func newReimbursementCategory() *Category {
+	return &Category{"reimbursement", "Reimbursement"}
 }

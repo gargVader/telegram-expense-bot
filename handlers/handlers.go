@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/gargVader/telegram-expense-bot/log"
+	"github.com/gargVader/telegram-expense-bot/models"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gargVader/telegram-expense-bot/models/category"
 	"gopkg.in/telebot.v3"
@@ -44,7 +47,7 @@ func AddSpendHandler(c telebot.Context) error {
 	// Form Response
 	resp := makeWhichCategoryMessage(name)
 	selector := &telebot.ReplyMarkup{}
-	rowList := mapExpenseCategoryToSelectorRowList(*selector, category.ExpenseCategories, amount, name)
+	rowList := mapExpenseCategoryToSelectorRowList(*selector, category.ExpenseCategories, amount, strings.TrimSpace(name))
 	selector.Inline(
 		rowList...,
 	)
@@ -57,19 +60,29 @@ func CallbackHandler(c telebot.Context) error {
 		args = c.Args()
 	)
 
-	category := args[0]
+	category := strings.TrimSpace(args[0])
 	amount := args[1]
 	name := args[2]
+
+	amountFloat, _ := strconv.ParseFloat(amount, 64)
 
 	fmt.Println(args[0])
 
 	// Save to database
-
+	newExpense := models.Expense{
+		Date:        time.Now(),
+		Description: name,
+		Amount:      amountFloat,
+		CategoryID:  category,
+	}
+	log.Logger.Printf("%+v", newExpense)
+	newExpense.CreateExpense()
+	//log.Logger.Printf("%v", models.GetAllExpenses())
 	resp := makeSuccessMessage(amount, name, category)
 	return c.EditOrSend(resp, "HTML")
 }
 
-func mapExpenseCategoryToSelectorRowList(selector telebot.ReplyMarkup, expenseCategoryList []category.ExpenseCategory, amount float64, name string) []telebot.Row {
+func mapExpenseCategoryToSelectorRowList(selector telebot.ReplyMarkup, expenseCategoryList []category.Category, amount float64, name string) []telebot.Row {
 	var rowList []telebot.Row
 	for _, category := range expenseCategoryList {
 		row := selector.Row(selector.Data(category.DisplayName, category.ID, strconv.FormatFloat(amount, 'f', -1, 64), name))
