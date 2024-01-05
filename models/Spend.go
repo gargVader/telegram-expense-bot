@@ -5,11 +5,12 @@ import (
 )
 
 type Expense struct {
-	Date          time.Time `json:"date"`
-	Description   string    `json:"description"`
-	Amount        float64   `json:"amount"`
-	CategoryID    string    `json:"categoryId"`
-	SubCategoryID string    `json:"subCategoryId"`
+	Date           time.Time `json:"date"`
+	Description    string    `json:"description"`
+	Amount         float64   `json:"amount"`
+	CategoryID     string    `json:"categoryID"`
+	SubCategoryID  string    `json:"subCategoryID"`
+	IsReimbursable bool      `json:"isReimbursable"`
 }
 
 func (e *Expense) CreateExpense() {

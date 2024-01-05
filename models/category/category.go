@@ -17,16 +17,14 @@ var CommutingCategory = newCommutingCategory()
 var PurchasesCategory = newPurchasesCategory()
 var UtilitiesCategory = newUtilitesCategory()
 var MiscellaneousCategory = newMiscellaneousCategory()
-var ReimbursementCategory = newReimbursementCategory()
 
-var categoryMap = map[string]Category{
+var CategoryMap = map[string]Category{
 	OutsideFoodCategory.ID:   *OutsideFoodCategory,
 	GroceriesCategory.ID:     *GroceriesCategory,
 	CommutingCategory.ID:     *CommutingCategory,
 	PurchasesCategory.ID:     *PurchasesCategory,
 	UtilitiesCategory.ID:     *UtilitiesCategory,
 	MiscellaneousCategory.ID: *MiscellaneousCategory,
-	ReimbursementCategory.ID: *ReimbursementCategory,
 }
 
 var ExpenseCategories = []Category{
@@ -36,7 +34,6 @@ var ExpenseCategories = []Category{
 	*PurchasesCategory,
 	*UtilitiesCategory,
 	*MiscellaneousCategory,
-	*ReimbursementCategory,
 }
 
 func newOutsideFoodCategory() *Category {
@@ -61,8 +58,4 @@ func newUtilitesCategory() *Category {
 
 func newMiscellaneousCategory() *Category {
 	return &Category{"miscelleaneous", "Miscelleaneous"}
-}
-
-func newReimbursementCategory() *Category {
-	return &Category{"reimbursement", "Reimbursement"}
 }

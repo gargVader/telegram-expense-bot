@@ -16,6 +16,7 @@ func ConnectDB() {
 	}
 	db = d
 	db.AutoMigrate(&Expense{})
+	db.AutoMigrate(&DescriptionCategory{})
 }
 
 func GetDB() *gorm.DB {

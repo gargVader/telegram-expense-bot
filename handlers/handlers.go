@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/gargVader/telegram-expense-bot/log"
 	"github.com/gargVader/telegram-expense-bot/models"
 	"strconv"
 	"strings"
@@ -40,19 +39,35 @@ func AddSpendHandler(c telebot.Context) error {
 		return c.Send(wrong_spend_format_message)
 	}
 
-	name := strings.Join(vals[1:], " ")
+	description := strings.Join(vals[1:], " ")
 
-	fmt.Printf("Amount=%g, Name=%s\n", amount, name)
+	fmt.Printf("Amount=%g, Name=%s\n", amount, description)
 
 	// Form Response
-	resp := makeWhichCategoryMessage(name)
-	selector := &telebot.ReplyMarkup{}
-	rowList := mapExpenseCategoryToSelectorRowList(*selector, category.ExpenseCategories, amount, strings.TrimSpace(name))
-	selector.Inline(
-		rowList...,
-	)
-
-	return c.EditOrSend(resp, selector, "HTML")
+	dc, err := models.GetDescriptionCategoryByDescription(description)
+	if err == nil {
+		// Category already known
+		// Save to database
+		newExpense := models.Expense{
+			Date:          time.Now(),
+			Description:   description,
+			Amount:        amount,
+			CategoryID:    dc.CategoryID,
+			SubCategoryID: dc.SubCategoryID,
+		}
+		newExpense.CreateExpense()
+		resp := makeSuccessMessage(strconv.FormatFloat(amount, 'f', -1, 64), description, dc.CategoryID)
+		return c.EditOrSend(resp, "HTML")
+	} else {
+		// Category not known
+		resp := makeWhichCategoryMessage(description)
+		selector := &telebot.ReplyMarkup{}
+		rowList := mapExpenseCategoryToSelectorRowList(*selector, category.ExpenseCategories, amount, strings.TrimSpace(description))
+		selector.Inline(
+			rowList...,
+		)
+		return c.EditOrSend(resp, selector, "HTML")
+	}
 }
 
 func CallbackHandler(c telebot.Context) error {
@@ -62,7 +77,7 @@ func CallbackHandler(c telebot.Context) error {
 
 	category := strings.TrimSpace(args[0])
 	amount := args[1]
-	name := args[2]
+	description := args[2]
 
 	amountFloat, _ := strconv.ParseFloat(amount, 64)
 
@@ -71,14 +86,20 @@ func CallbackHandler(c telebot.Context) error {
 	// Save to database
 	newExpense := models.Expense{
 		Date:        time.Now(),
-		Description: name,
+		Description: description,
 		Amount:      amountFloat,
 		CategoryID:  category,
 	}
-	log.Logger.Printf("%+v", newExpense)
 	newExpense.CreateExpense()
-	//log.Logger.Printf("%v", models.GetAllExpenses())
-	resp := makeSuccessMessage(amount, name, category)
+	resp := makeSuccessMessage(amount, description, category)
+	// Also add to DescriptionCategory table
+	description = strings.TrimSpace(description)
+	description = strings.ToLower(description)
+	newDC := models.DescriptionCategory{
+		Description: description,
+		CategoryID:  category,
+	}
+	newDC.CreateDescriptionCategory()
 	return c.EditOrSend(resp, "HTML")
 }
 
