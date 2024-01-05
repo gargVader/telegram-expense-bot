@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/gargVader/go-telegram-tut/handlers"
+	"github.com/gargVader/telegram-expense-bot/handlers"
 	"github.com/joho/godotenv"
 	"gopkg.in/telebot.v3"
 )
