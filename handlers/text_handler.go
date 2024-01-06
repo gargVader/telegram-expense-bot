@@ -1,28 +1,22 @@
 package handlers
 
 import (
-	"fmt"
+	"github.com/gargVader/telegram-expense-bot/log"
 	"github.com/gargVader/telegram-expense-bot/models"
+	"gopkg.in/telebot.v3"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/gargVader/telegram-expense-bot/models/category"
-	"gopkg.in/telebot.v3"
 )
 
 func OnTextHandler(c telebot.Context) error {
 	text := c.Text()
-	fmt.Println(text)
+	log.Logger.Printf("OnTextHandler: %s", text)
 
-	return AddSpendHandler(c)
+	return addSpend(c)
 }
 
-func getSelectorRows() {
-
-}
-
-func AddSpendHandler(c telebot.Context) error {
+func addSpend(c telebot.Context) error {
 	var (
 		text = c.Text()
 	)
@@ -41,7 +35,7 @@ func AddSpendHandler(c telebot.Context) error {
 
 	description := strings.Join(vals[1:], " ")
 
-	fmt.Printf("Amount=%g, Name=%s\n", amount, description)
+	log.Logger.Printf("Amount=%g, Name=%s\n", amount, description)
 
 	// Form Response
 	dc, err := models.GetDescriptionCategoryByDescription(description)
@@ -62,7 +56,7 @@ func AddSpendHandler(c telebot.Context) error {
 		// Category not known
 		resp := makeWhichCategoryMessage(description)
 		selector := &telebot.ReplyMarkup{}
-		rowList := mapExpenseCategoryToSelectorRowList(*selector, category.ExpenseCategories, amount, strings.TrimSpace(description))
+		rowList := mapExpenseCategoryToSelectorRowList(*selector, models.ExpenseCategories, amount, strings.TrimSpace(description))
 		selector.Inline(
 			rowList...,
 		)
@@ -70,40 +64,7 @@ func AddSpendHandler(c telebot.Context) error {
 	}
 }
 
-func CallbackHandler(c telebot.Context) error {
-	var (
-		args = c.Args()
-	)
-
-	category := strings.TrimSpace(args[0])
-	amount := args[1]
-	description := args[2]
-
-	amountFloat, _ := strconv.ParseFloat(amount, 64)
-
-	fmt.Println(args[0])
-
-	// Save to database
-	newExpense := models.Expense{
-		Date:        time.Now(),
-		Description: description,
-		Amount:      amountFloat,
-		CategoryID:  category,
-	}
-	newExpense.CreateExpense()
-	resp := makeSuccessMessage(amount, description, category)
-	// Also add to DescriptionCategory table
-	description = strings.TrimSpace(description)
-	description = strings.ToLower(description)
-	newDC := models.DescriptionCategory{
-		Description: description,
-		CategoryID:  category,
-	}
-	newDC.CreateDescriptionCategory()
-	return c.EditOrSend(resp, "HTML")
-}
-
-func mapExpenseCategoryToSelectorRowList(selector telebot.ReplyMarkup, expenseCategoryList []category.Category, amount float64, name string) []telebot.Row {
+func mapExpenseCategoryToSelectorRowList(selector telebot.ReplyMarkup, expenseCategoryList []models.Category, amount float64, name string) []telebot.Row {
 	var rowList []telebot.Row
 	for _, category := range expenseCategoryList {
 		row := selector.Row(selector.Data(category.DisplayName, category.ID, strconv.FormatFloat(amount, 'f', -1, 64), name))

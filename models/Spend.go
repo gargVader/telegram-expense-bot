@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/gargVader/telegram-expense-bot/app"
 	"time"
 )
 
@@ -14,26 +15,26 @@ type Expense struct {
 }
 
 func (e *Expense) CreateExpense() {
-	GetDB().Create(&e)
+	app.DB.Create(&e)
 }
 
 func GetAllExpenses() []Expense {
 	var expenses []Expense
-	GetDB().Find(expenses)
+	app.DB.Find(expenses)
 	return expenses
 }
 
 func GetExpenseById(ID int64) Expense {
 	var expense Expense
-	GetDB().Where("ID=?", ID).Find(&expense)
+	app.DB.Where("ID=?", ID).Find(&expense)
 	return expense
 }
 
 func DeleteExpense(ID int64) {
 	var e Expense
-	GetDB().Where("ID=?", ID).Delete(e)
+	app.DB.Where("ID=?", ID).Delete(e)
 }
 
 func (e *Expense) DeleteExpense() {
-	GetDB().Delete(&e)
+	app.DB.Delete(&e)
 }

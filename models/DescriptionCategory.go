@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/gargVader/telegram-expense-bot/app"
 	"strings"
 )
 
@@ -11,12 +12,12 @@ type DescriptionCategory struct {
 }
 
 func (dc *DescriptionCategory) CreateDescriptionCategory() {
-	GetDB().Create(&dc)
+	app.DB.Create(&dc)
 }
 
 func GetAllDescriptionCategory() []DescriptionCategory {
 	var d []DescriptionCategory
-	GetDB().Find(d)
+	app.DB.Find(d)
 	return d
 }
 
@@ -24,15 +25,15 @@ func GetDescriptionCategoryByDescription(description string) (DescriptionCategor
 	description = strings.TrimSpace(description)
 	description = strings.ToLower(description)
 	var d DescriptionCategory
-	result := GetDB().Where(&DescriptionCategory{Description: description}).First(&d)
+	result := app.DB.Where(&DescriptionCategory{Description: description}).First(&d)
 	return d, result.Error
 }
 
 func DeleteDescriptionCategoryByDescription(description string) {
 	var d DescriptionCategory
-	GetDB().Where("description=?", description).Delete(d)
+	app.DB.Where("description=?", description).Delete(d)
 }
 
 func (d *DescriptionCategory) DeleteDescriptionCategory() {
-	GetDB().Delete(&d)
+	app.DB.Delete(&d)
 }
